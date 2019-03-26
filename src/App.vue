@@ -1,8 +1,15 @@
 <template>
   <v-app>
+    <v-toolbar >
+    </v-toolbar>
+
     <v-content>
-      <Map/>
-      <Weather/>
+      <v-container fluid>
+        <v-layout row wrap>
+            <Map/>
+            <Weather/>
+        </v-layout>
+      </v-container>
     </v-content>
   </v-app>
 </template>
@@ -15,7 +22,7 @@ export default {
   name: 'App',
   components: {
     Map,
-    Weather
+    Weather,
   },
   data () {
     return {

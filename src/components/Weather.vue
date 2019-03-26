@@ -2,14 +2,12 @@
     
     
   
+	<v-flex xs6 order-lg2>
     <div>
-    
-
-
-    <h1>Weather</h1>
-
-
-  </div>
+      <h1>TEST</h1>
+    </div>
+		
+	</v-flex> 
  
 
   
@@ -17,6 +15,7 @@
 
 <script>
 export default {
+  name:'Weather',
   props: {
     msg: String
   }
