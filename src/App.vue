@@ -3,17 +3,12 @@
         <v-toolbar dark></v-toolbar>
         <Map @clicked="onClickChild" />
         <Weather :data="data" />
-        
     </v-app>
 </template>
 <script>
 import Map from "./components/Map";
 import Weather from "./components/Weather";
 import axios from "axios";
-
-
-
-
 
 export default {
     name: "App",
@@ -29,19 +24,14 @@ export default {
     mounted() {
         //default oslo forecast
         this.getWeather(57.574779, 10.744629);
-
-        //Map.onMapClick
-
     },
 
     methods: {
-        test() {
-            Map.methods.onMapClick()
-        },
+        // when map in component <Map> is clicked, it gets a value that has lat and lon and updates current weather forecast
         onClickChild(value) {
             this.getWeather(value.lat, value.lng)
-            //console.log(value.lat) // someValue
         },
+        // current weather forecast at given location
         getWeather(lat, lon) {
             const token = "3f51efbc33effda11899a0ace65c7aa3";
             axios

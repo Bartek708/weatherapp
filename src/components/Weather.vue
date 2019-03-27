@@ -1,5 +1,7 @@
 <template>
   <v-container grid-list-md text-xs-center>
+
+    <!--Vuetify Iterator, Iterate through data.list-->
     <v-data-iterator
       :items="data.list"
       :rows-per-page-items="rowsPerPageItems"
@@ -28,6 +30,8 @@ export default {
   },
   data() {
     return {
+
+      //setup display data table pages
       rowsPerPageItems: [4, 8, 12],
       pagination: {
         rowsPerPage: 4

@@ -2,14 +2,19 @@
     <v-container>
         <v-layout>
             <v-flex style="width: 500px; height: 500px;" id="mapid">
-                <h1>Map</h1>
             </v-flex>
         </v-layout>
+        <v-select label="City" item-text="city,lat,lon" :items="options" @input="setCityOption"></v-select>
+        <p onmouseover="this.style.color='blue'" style="cursor: pointer;" onmouseout="this.style.color='black'" v-on:click="setCity(60.392984, 5.336146)">Bergen</p>
+        <p onmouseover="this.style.color='blue'" style="cursor: pointer;" onmouseout="this.style.color='black'" v-on:click="setCity(63.418366, 10.448214)">Trondheim</p>
+        <p onmouseover="this.style.color='blue'" style="cursor: pointer;" onmouseout="this.style.color='black'" v-on:click="setCity(69.654148, 18.967907)">Tromsø</p>
+        <p onmouseover="this.style.color='blue'" style="cursor: pointer;" onmouseout="this.style.color='black'" v-on:click="setCity(59.908804, 10.748939)">Oslo</p>
     </v-container>
 </template>
 <script>
 import axios from 'axios'
 import L from "leaflet"
+import App from "../App";
 
 export default {
     name: 'Map',
@@ -20,11 +25,18 @@ export default {
             data: [],
             coords: [],
             cor: null,
+            selopt: null,
             mymap: null,
             popup: null,
             marker: null,
             lat: null,
             lon: null,
+            options: [
+                { city: "Bergen", lat: 60.392984, lon: 5.336146 },
+                { city: "Trondheim", lat: 63.418366, lon: 10.448214 },
+                { city: "Tromsø", lat: 69.654148, lon: 18.967907 },
+                { city: "Oslo", lat: 59.908804, lon: 10.748939 }
+            ]
         }
     },
     methods: {
@@ -34,12 +46,10 @@ export default {
                 iconsArr.push(res.icon)
             ));
         },
-        onClickButton(event) {
-            //this.$emit('clicked', 'someValue')
-        },
         test() {
             console.log("test")
         },
+        // sets marker with weather icon on this location
         setMarker(weatherIcon, lat, lon) {
             let weatherMark = L.icon({
                 iconUrl: 'http://openweathermap.org/img/w/' + weatherIcon + '.png',
@@ -47,10 +57,25 @@ export default {
             })
 
             let marker2 = L.marker([lat, lon], { icon: weatherMark }).addTo(this.mymap);
-            //marker2.addTo(this.mymap);
-            //console.log(marker2)
             this.markers.push(L.marker([lat, lon]))
         },
+        // adds marker to mymap
+        setMarkerSimple(lat, lon) {
+            let marker2 = L.marker([lat, lon]).addTo(this.mymap);
+        },
+        // jumps and zooms to the city when clicked on map
+        setCity(lat, lon) {
+            this.mymap.flyTo([lat, lon], 8)
+        },
+        // jumps and zooms to the city from the option menu
+        setCityOption(city) {
+
+            this.mymap.flyTo([city.lat, city.lon], 8)
+            //this.setMarkerSimple(city.lat, city.lon).addTo(this.mymap);
+
+        },
+        // finds 5 nearest cities/zones by the marker and set weather marks that 
+        // corresponds to current weather info for that zone
         setMarkers() {
             let iconsArr = []
             let long = []
@@ -60,14 +85,9 @@ export default {
 
             this.markers = markers
 
-            //console.log("CITIES")
-            //console.log(this.cities.list)
-
-
             for (let i = 0; i < this.markers.length; i++) {
                 this.mymap.removeLayer(this.markers[i])
             }
-            //this.mymap.removeLayer(this.markers[0])
 
             for (let i = 0; i < this.cities.list.length; i++) {
                 let weatherIcon = this.cities.list[i].weather[0].icon
@@ -77,9 +97,6 @@ export default {
                 this.setMarker(weatherIcon, lat, lon)
 
             };
-
-            //console.log(this.markers.length)
-
         },
         // on click sets a cursor to that location and removes previously declared curso
         onMapClick(e) {
@@ -87,41 +104,27 @@ export default {
 
             this.mymap.removeLayer(this.marker)
             this.marker = L.marker(e.latlng).addTo(this.mymap);
-            this.popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(this.mymap);
-            //console.log(e.latlng.toString())
             this.cor = e.latlng
-
-
-            //console.log(this.cor.lat)
             this.fetchData()
         },
+        // finds 5 nearest cities/zones by the marker 
         fetchData() {
             this.lat = this.cor.lat
             this.lon = this.cor.lng
 
+            //sends coordinates to parent compenent <App>
             this.$emit('clicked', this.cor)
-            //console.log(this.lat)
-            //fetches weather data
+
             var token = "&APPID=3f51efbc33effda11899a0ace65c7aa3"
             axios
                 .get('http://api.openweathermap.org/data/2.5/find?lat=' + this.lat + '&lon=' + this.lon + '&cnt=5' + token)
                 .then(response => (this.cities = response.data,
-
                     this.setMarkers()
-
                 ))
 
-            //console.log(this.cities)
-
-            /*this.data.map((res) => (
-                console.log(res)
-            ));*/
         },
         setMap() {
-
+            // fetches mapobject from leaflet and add to mymap
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
                 maxZoom: 18,
                 id: 'mapbox.streets',
@@ -131,90 +134,17 @@ export default {
             this.popup = L.popup();
             let icon;
 
-            /*let icons = [{
-                    icon: "01d",
-                    lat: 60.84,
-                    lon: 10.0618
-                }, {
-                    icon: "02d",
-                    lat: 60.6987,
-                    lon: 10.3519
-                },
-                {
-                    icon: "01d",
-                    lat: 60.7957,
-                    lon: 10.6916
-                },
-                {
-                    icon: "01d",
-                    lat: 60.9333,
-                    lon: 10.7
-                },
-                {
-                    icon: "01d",
-                    lat: 60.6833,
-                    lon: 10.6167
-                },
-                {
-                    icon: "02d",
-                    lat: 60.7947,
-                    lon: 10.6929
-                },
-                {
-                    icon: "02d",
-                    lat: 61.1146,
-                    lon: 10.4674
-                },
-                {
-                    icon: "01d",
-                    lat: 60.8878,
-                    lon: 9.6414
-                }
-            ]
-            */
-
-            /*
-            let iconsArr = []
-            let long = []
-            let lati = []
-            icons.map((res) => (
-                iconsArr.push(res.icon) && long.push(res.lon) && lati.push(res.lat)
-            ));
-
-
-            let weatherIcon = "01d"
-            let weatherMark;
-
-            for (let i = 0; i < iconsArr.length; i++) {
-                let weatherIcon = iconsArr[i];
-                let weatherMark = L.icon({
-                    iconUrl: 'http://openweathermap.org/img/w/' + weatherIcon + '.png',
-                    iconSize: [80, 80]
-                })
-
-                let marker2 = L.marker([String(lati[i]), String(long[i])], { icon: weatherMark }).addTo(this.mymap);
-            }
-            */
-
-            //sets current location to Oslo
-            // L.marker([51.941196,4.512291], ).addTo(mymap);
+            //sets default location to oslo
             this.lat = 60.859515;
             this.lon = 10.233114;
             this.marker = L.marker([this.lat, this.lon]).addTo(this.mymap);
             this.mymap.on('click', this.onMapClick);
-
-
-
         }
     },
     mounted() {
-
         //creates the default map upon closing the application, here being a map over norway with zoom 5
         this.mymap = L.map('mapid').setView([60.859515, 10.233114], 5);
-
         this.setMap()
-
-
     }
 }
 </script>
