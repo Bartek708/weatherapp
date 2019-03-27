@@ -1,38 +1,41 @@
 <template>
-    
-    
-  
-    <v-flex>
-      
-
-    <h1>Weather</h1>
-    {{data}}
-
-  </v-flex>
- 
-
-  
+  <v-container grid-list-md text-xs-center>
+    <v-data-iterator
+      :items="data.list"
+      :rows-per-page-items="rowsPerPageItems"
+      :pagination.sync="pagination"
+      content-tag="v-layout"
+      row
+      wrap
+    >
+      <template v-slot:item="props">
+        <v-flex xs12 sm6 md4 lg3>
+          <ForecastCard :item="props" :data="data"/>
+        </v-flex>
+      </template>
+    </v-data-iterator>
+  </v-container>
 </template>
 
 <script>
-import axios from 'axios'
+import ForecastCard from "./ForecastCard";
 
 export default {
-  props: {
-    msg: String
+  name: "Weather",
+  props: ["data", "city"],
+  components: {
+    ForecastCard
   },
-  data () {
-    	return {
-    		data: []
-    	}
-  	},
-  mounted () {
-    var token = "&APPID=3f51efbc33effda11899a0ace65c7aa3"
-      axios
-        .get('http://api.openweathermap.org/data/2.5/find?lat=55.5&lon=37.5&cnt=10&APPID=3f51efbc33effda11899a0ace65c7aa3')
-        .then(response => (this.data = response.data))
-    }
-}
+  data() {
+    return {
+      rowsPerPageItems: [4, 8, 12],
+      pagination: {
+        rowsPerPage: 4
+      }
+    };
+  },
+  mounted() {}
+};
 </script>
 
 

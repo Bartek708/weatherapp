@@ -1,24 +1,20 @@
 <template>
-	<v-flex >
-    
-  
-
-		<h1>Map</h1>
-
+<v-container>
+		<v-layout>
+			<v-flex style="width: 500px; height: 500px;"
+				id="mapid">
 		<!-- A div containing the map element -->
-    	<div  style="width: 500px;
- 	 height: 500px;" id="mapid" >
-  		</div>
-    	
-	</v-flex>
-
+			</v-flex>
+		</v-layout>
+</v-container>
 </template>
 
 <script>
+import L from 'leaflet'
+
 export default {
   name: 'Map',
   props: {
-    msg: String
   },
   mounted() {
 
