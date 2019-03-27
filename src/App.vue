@@ -10,6 +10,7 @@
 import Map from "./components/Map";
 import Weather from "./components/Weather";
 import axios from "axios";
+import {EventBus} from './EventBus'
 
 export default {
   name: "App",
@@ -24,18 +25,21 @@ export default {
   },
   mounted() {
     //default oslo forecast
-    this.getWeather(57.574779, 10.744629);
+  },
+
+  created(){
+    EventBus.$on('pin-click', latlng => this.getWeather(latlng))    
   },
 
   methods: {
-    getWeather(lat, lon) {
+    getWeather(latlng) {
       const token = "3f51efbc33effda11899a0ace65c7aa3";
       axios
         .get(
           "http://api.openweathermap.org/data/2.5/forecast?lat=" +
-            lat +
+            latlng.lat +
             "&lon=" +
-            lon +
+            latlng.lng +
             "&units=metric&appid=" +
             token
         )

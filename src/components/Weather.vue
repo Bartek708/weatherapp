@@ -10,7 +10,7 @@
     >
       <template v-slot:item="props">
         <v-flex xs12 sm6 md4 lg3>
-          <ForecastCard :item="props" :data="data"/>
+          <ForecastCard :item="props.item" :data="data"/>
         </v-flex>
       </template>
     </v-data-iterator>
